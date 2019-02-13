@@ -89,14 +89,24 @@ router.put("/:id", (req, res) => {
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
 
-  Users.remove(id)
+  Users.removeUserPosts(id)
     .then(result => {
       if (result) {
-        Users.get().then(users => {
-          res.json(users);
-        });
+        Users.remove(id)
+          .then(result => {
+            if (result) {
+              Users.get().then(users => {
+                res.json(users);
+              });
+            } else {
+              res.status(404).json({ message: "Failed to delete user" });
+            }
+          })
+          .catch(() => {
+            res.status(500).json({ message: "Server Error" });
+          });
       } else {
-        res.status(404).json({ message: "Failed to delete user" });
+        res.status(500).json({ message: "failed to delete user posts" });
       }
     })
     .catch(() => {
