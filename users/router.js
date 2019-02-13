@@ -5,8 +5,12 @@ const Users = require("./userDb");
 const router = express.Router();
 
 const upperName = (req, res, next) => {
-  req.body.name = req.body.name.toUpperCase();
-  next();
+  if (!req.body.name) {
+    res.status(422).json({ message: "name required" });
+  } else {
+    req.body.name = req.body.name.toUpperCase();
+    next();
+  }
 };
 
 router.get("/", (req, res) => {
@@ -95,20 +99,16 @@ router.delete("/:id", (req, res) => {
   const { id } = req.params;
 
   Users.removeUserPosts(id)
-    .then(result => {
-      if (result) {
-        Users.remove(id).then(result => {
-          if (result) {
-            Users.get().then(users => {
-              res.json(users);
-            });
-          } else {
-            res.status(404).json({ message: "Failed to delete user" });
-          }
-        });
-      } else {
-        res.status(500).json({ message: "failed to delete user posts" });
-      }
+    .then(() => {
+      Users.remove(id).then(result => {
+        if (result) {
+          Users.get().then(users => {
+            res.json(users);
+          });
+        } else {
+          res.status(404).json({ message: "Failed to delete user" });
+        }
+      });
     })
     .catch(() => {
       res.status(500).json({ message: "Server Error" });
