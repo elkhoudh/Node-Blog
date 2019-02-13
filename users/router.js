@@ -4,6 +4,11 @@ const Users = require("./userDb");
 
 const router = express.Router();
 
+const upperName = (req, res, next) => {
+  req.body.name = req.body.name.toUpperCase();
+  next();
+};
+
 router.get("/", (req, res) => {
   Users.get()
     .then(users => {
@@ -38,7 +43,7 @@ router.get("/posts/:id", (req, res) => {
     });
 });
 
-router.post("/", (req, res) => {
+router.post("/", upperName, (req, res) => {
   const { name } = req.body;
   if (!name) {
     res.status(422).json({ message: "Name required" });
@@ -53,7 +58,7 @@ router.post("/", (req, res) => {
   }
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", upperName, (req, res) => {
   const { name } = req.body;
   const { id } = req.params;
 

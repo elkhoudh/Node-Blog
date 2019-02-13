@@ -39,7 +39,7 @@ router.post("/:id", (req, res) => {
       .then(user => {
         if (user) {
           Posts.insert({ text, user_id: id })
-            .then(post => {
+            .then(() => {
               Posts.get().then(posts => {
                 res.json(posts);
               });
